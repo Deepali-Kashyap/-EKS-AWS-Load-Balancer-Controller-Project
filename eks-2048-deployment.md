@@ -1,50 +1,106 @@
-# 1. Create EKS cluster with Fargate
+## Prerequisites
+```
+Install kubectl 
 
+Install eksctl 
+
+Install AWS CLI
+
+aws configure
+```
+
+## Install EKS using Fargate
+
+```
 eksctl create cluster --name demo-cluster --region us-east-1 --fargate
-
-# 2. Update kubeconfig
-aws eks update-kubeconfig --name demo-cluster --region us-east-1
-
-# 3. Deploy app (2048 game)
+```
+## Deploy the app
+```
 kubectl apply -f deploy.yaml
+```
+ ## Deploy the service
+```
 kubectl apply -f service.yaml
+```
+## 2048 App
 
-# 4. Create Fargate profile
+## Create Fargate profile
+
+```
 eksctl create fargateprofile \
-  --cluster demo-cluster \
-  --region us-east-1 \
-  --name alb-sample-app \
-  --namespace game-2048
+    --cluster demo-cluster \
+    --region us-east-1 \
+    --name alb-sample-app \
+    --namespace game-2048
+```
 
-# 5. Associate IAM OIDC provider
-eksctl utils associate-iam-oidc-provider \
-  --cluster demo-cluster \
-  --approve
+## Deploy the deployment, service and Ingress
 
-# 6. Create IAM policy for ALB Controller
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/examples/2048/2048_full.yaml
+```
+
+## Commands to configure IAM OIDC provider
+```
+eksctl utils associate-iam-oidc-provider --cluster $cluster_name --resgion us-east-1 --approve
+```
+
+## How to setup alb add on
+
+Download IAM policy
+
+```
 curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.11.0/docs/install/iam_policy.json
+```
+
+Create IAM Policy
+
+```
 aws iam create-policy \
-  --policy-name AWSLoadBalancerControllerIAMPolicy \
-  --policy-document file://iam_policy.json
+    --policy-name AWSLoadBalancerControllerIAMPolicy \
+    --policy-document file://iam_policy.json
+```
 
-# 7. Create IAM Service Account for ALB Controller
+Create IAM Role
+
+```
 eksctl create iamserviceaccount \
-  --cluster demo-cluster \
-  --namespace kube-system \
-  --name aws-load-balancer-controller \
+  --cluster=<your-cluster-name> \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
   --role-name AmazonEKSLoadBalancerControllerRole \
-  --attach-policy-arn arn:aws:iam::<your-aws-account-id>:policy/AWSLoadBalancerControllerIAMPolicy \
+  --attach-policy-arn=arn:aws:iam::<your-aws-account-id>:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
+```
 
-# 8. Install AWS Load Balancer Controller via Helm
+## Deploy ALB controller
+
+Add helm repo
+
+```
 helm repo add eks https://aws.github.io/eks-charts
-helm upgrade -i aws-load-balancer-controller eks/aws-load-balancer-controller \
+```
+
+Update the repo
+
+```
+helm repo update eks
+```
+
+Install
+
+```
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller \            
   -n kube-system \
-  --set clusterName=demo-cluster \
+  --set clusterName=<your-cluster-name> \
   --set serviceAccount.create=false \
   --set serviceAccount.name=aws-load-balancer-controller \
-  --set region=us-east-1 \
+  --set region=<region> \
   --set vpcId=<your-vpc-id>
+```
 
-# 9. Verify deployment
+Verify that the deployments are running.
+
+```
 kubectl get deployment -n kube-system aws-load-balancer-controller
+```
