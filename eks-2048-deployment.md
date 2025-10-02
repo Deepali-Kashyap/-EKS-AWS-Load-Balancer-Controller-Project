@@ -1,7 +1,6 @@
 # 1. Create EKS cluster with Fargate
-```
+
 eksctl create cluster --name demo-cluster --region us-east-1 --fargate
-```
 
 # 2. Update kubeconfig
 aws eks update-kubeconfig --name demo-cluster --region us-east-1
