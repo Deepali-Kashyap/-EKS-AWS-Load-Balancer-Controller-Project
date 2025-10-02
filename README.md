@@ -16,3 +16,5 @@ This project demonstrates how to deploy the **2048 game** on **Amazon EKS** usin
 
 ---
 <img width="1906" height="1027" alt="Screenshot from 2025-10-02 12-41-15" src="https://github.com/user-attachments/assets/a64fcc9e-f91c-4065-96e2-b2d119ed2224" />
+
+<img width="400" height="500" alt="eks" src="https://github.com/user-attachments/assets/43463573-f2af-4c79-8935-a2c4107b150d" />
