@@ -13,13 +13,3 @@ This project demonstrates deploying a containerized 2048 game on Amazon EKS usin
 4. Install and configure AWS Load Balancer Controller
 5. Expose application using ALB Ingress
 
-## Files
-- `deploy.yaml` → Kubernetes Deployment for 2048 game
-- `service.yaml` → Service definition (NodePort/ClusterIP)
-- `ingress.yaml` → Ingress resource for ALB (or use AWS sample full.yaml)
-- `iam_policy.json` → IAM policy for ALB Controller
-
-## Lessons Learned
-- Wait for cluster stabilization before creating Fargate profiles
-- ALB deletion takes time, patience required
-- IAM OIDC provider must be associated before installing ALB Controller
